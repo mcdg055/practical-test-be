@@ -1,0 +1,12 @@
+# Laravel & Composer
+/vendor
+/node_modules
+composer.lock
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Database mounts
+data/

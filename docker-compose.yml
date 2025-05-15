@@ -1,0 +1,41 @@
+networks:
+    application:
+        driver: bridge
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: practical-test-api
+        ports:
+            - 8000:8000
+        volumes:
+            - .:/app
+        depends_on:
+            - db
+        networks:
+            - application
+        entrypoint: ["/bin/sh", "-c"]
+        command:
+            - |
+                composer install
+                php artisan migrate
+                php artisan serve --host=0.0.0.0 --port=8000
+    db:
+        image: mysql:8.0.30
+        ports:
+            - "3306:3306"
+        volumes:
+            - ./data:/var/lib/mysql
+        environment:
+            - MYSQL_ROOT_PASSWORD=
+            - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+            - MYSQL_DATABASE=practical_test
+        networks:
+            - application
+        container_name: mysql-db
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
