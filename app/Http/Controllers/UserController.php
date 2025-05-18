@@ -21,14 +21,14 @@ class UserController extends Controller
         $data = $request->all();
 
         $page = Arr::get($data, 'page', 1);
-        $limit = Arr::get($data, 'limit', 10);
+        $perPage = Arr::get($data, 'perPage', 10);
         $search = Arr::get($data, 'search', '');
 
         $users = User::with('roles')
             ->where('name', 'like', '%' . $search . '%')
             ->orWhere('email', 'like', '%' . $search . '%')
             ->orderBy('created_at', 'desc')
-            ->paginate($limit, ['*'], 'page', $page);
+            ->paginate($perPage, ['*'], 'page', $page);
 
         return UserResource::collection($users);
     }
