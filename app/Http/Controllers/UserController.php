@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\Users\UserPostRequest;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -72,5 +73,10 @@ class UserController extends Controller
         $user->delete();
 
         return response()->json($user, 200);
+    }
+
+    public function browseRoles(Request $request)
+    {
+        return response()->json(Role::pluck('name')->toArray());
     }
 }

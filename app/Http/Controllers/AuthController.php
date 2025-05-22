@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -18,6 +19,8 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         $token = Auth::attempt($credentials);
+        $refreshToken = JWTAuth::fromUser(Auth::user());
+        
         if (!$token) {
             return response()->json([
                 'status' => 'error',
@@ -31,6 +34,7 @@ class AuthController extends Controller
             'user' => $user,
             'authorization' => [
                 'token' => $token,
+                'refresh_token' => $refreshToken,
                 'type' => 'bearer',
             ]
         ]);
@@ -71,13 +75,22 @@ class AuthController extends Controller
 
     public function refresh()
     {
-        return response()->json([
-            'user' => Auth::user(),
-            'authorization' => [
-                'token' => Auth::refresh(),
-                'type' => 'bearer',
-            ]
-        ]);
+        try {
+            $newToken = JWTAuth::parseToken()->refresh();
+
+            return response()->json([
+                'user' => JWTAuth::user(),
+                'authorization' => [
+                    'token' => $newToken,
+                    'type' => 'bearer',
+                ]
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized',
+            ], 401);
+        }
     }
 
     public function me()
