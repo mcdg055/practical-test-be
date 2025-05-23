@@ -28,7 +28,7 @@ class UserController extends Controller
         $users = User::with('roles')
             ->where('name', 'like', '%' . $search . '%')
             ->orWhere('email', 'like', '%' . $search . '%')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('created_at', 'asc')
             ->paginate($perPage, ['*'], 'page', $page);
 
         return UserResource::collection($users);
@@ -47,11 +47,14 @@ class UserController extends Controller
     {
         $data = $request->all();
 
+        if ($password = Arr::get($data, 'password')) {
+            $data['password'] = Hash::make($password);
+        } else {
+            unset($data['password']);
+        }
+
         $user->fill($data);
 
-        if ($password = Arr::get($data, 'password')) {
-            $user->password = Hash::make($password);
-        }
         $user->syncRoles($request->roles);
         $user->save();
 
