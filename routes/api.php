@@ -12,18 +12,19 @@ Route::post('/auth/refresh', [AuthController::class, 'refresh'])->name('refresh'
 Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/logout',  [AuthController::class, 'logout'])->name('logout');
     Route::get( '/me',      [AuthController::class, 'me'])->name('user.me');
-
+    
+    //Roles
+    Route::get(     '/roles',           [UserController::class, 'browseRoles'])->middleware('role:Super Admin')->name('users.role.browse');
+    
     //Users
     Route::get(     '/users',           [UserController::class, 'browse'])->middleware('role:Super Admin')->name('users.user.browse');
     Route::get(     '/users/{user}',    [UserController::class, 'read'])->name('users.user.read');
     Route::post(    '/users',           [UserController::class, 'add'])->middleware('role:Super Admin')->name('users.user.add');
     Route::patch(   '/users/{user}',    [UserController::class, 'edit'])->name('users.user.edit');
     Route::delete(  '/users/{user}',    [UserController::class, 'delete'])->middleware('role:Super Admin')->name('users.user.delete');
-
-    //Roles
-    Route::get(     '/roles',           [UserController::class, 'browseRoles'])->middleware('role:Super Admin')->name('users.role.browse');
-
+    
     //IP Address
-    Route::post(    '/ip-address',           [IPAddressController::class, 'add'])->name('ip-address.ip.add');
+    Route::get(     '/ip-addresses',           [IPAddressController::class, 'browse'])->name('ip-addresses.ip-address.browse');
+    Route::post(    '/ip-addresses',           [IPAddressController::class, 'add'])->name('ip-addresses.ip-address.add');
     
 });

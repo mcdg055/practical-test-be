@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('ip')->unique();
             $table->string('type');
             $table->string('label');
-            $table->text('comments')->nullable();
+            $table->text('comment')->nullable();
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
 

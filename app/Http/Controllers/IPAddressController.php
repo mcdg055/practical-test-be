@@ -11,32 +11,21 @@ use Illuminate\Http\Request;
 
 class IPAddressController extends Controller
 {
-    public function __construct(private IPAddressService $service)
+    public function __construct(private IPAddressService $service) {}
+
+    public function browse(Request $request)
     {
-        
-    }
-     public function browse(Request $request)
-    {
-       
+        return IPAddressResource::collection($this->service->browse($request->all()));
     }
 
-    public function read(Request $request, IPAddress $ip)
-    {
-        
-    }
+    public function read(Request $request, IPAddress $ip) {}
 
-    public function edit(PatchRequest $request, IPAddress $ip)
-    {
-        
-    }
+    public function edit(PatchRequest $request, IPAddress $ip) {}
 
     public function add(PostRequest $request)
     {
         return new IPAddressResource($this->service->add($request->all()));
     }
 
-    public function delete(Request $request, IPAddress $ip)
-    {
-       
-    }
+    public function delete(Request $request, IPAddress $ip) {}
 }

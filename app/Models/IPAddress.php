@@ -7,15 +7,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class IPAddress extends Model
 {
-    const TYPE_IPV4 = 'ipv4';
-    const TYPE_IPV6 = 'ipv6';
+    const TYPE_IPV4 = 'IPv4';
+    const TYPE_IPV6 = 'IPv6';
 
     protected $table = 'ip_addresses';
 
     protected $fillable = [
         'ip',
         'label',
-        'comments',
+        'comment',
     ];
 
     public function user(): BelongsTo

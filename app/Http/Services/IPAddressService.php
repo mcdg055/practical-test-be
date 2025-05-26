@@ -8,6 +8,20 @@ use Illuminate\Support\Arr;
 
 class IPAddressService
 {
+    public function browse(array $data)
+    {
+        $page = Arr::get($data, 'page', 1);
+        $perPage = Arr::get($data, 'perPage', 10);
+        $search = Arr::get($data, 'search', '');
+
+        return IPAddress::with('user')
+            ->where('ip', 'like', '%' . $search . '%')
+            ->orWhere('label', 'like', '%' . $search . '%')
+            ->orWhere('comment', 'like', '%' . $search . '%')
+            ->orderBy('created_at', 'asc')
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
     public function add(array $data)
     {
         $ip = new IPAddress($data);

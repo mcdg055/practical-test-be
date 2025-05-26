@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
@@ -19,6 +20,14 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         $token = Auth::attempt($credentials);
+
+        if (!$token) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized',
+            ], 401);
+        }
+        
         $refreshToken = JWTAuth::fromUser(Auth::user());
         
         if (!$token) {
@@ -31,7 +40,7 @@ class AuthController extends Controller
         $user = Auth::user();
         return response()->json([
             'status' => 'success',
-            'user' => $user,
+            'user' => new UserResource($user->load('roles', 'permissions')),
             'authorization' => [
                 'token' => $token,
                 'refresh_token' => $refreshToken,
@@ -95,8 +104,6 @@ class AuthController extends Controller
 
     public function me()
     {
-        return response()->json(
-            Auth::user()
-        );
+        return new UserResource(Auth::user()->load('roles', 'permissions'));
     }
 }

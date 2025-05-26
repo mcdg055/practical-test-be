@@ -17,6 +17,7 @@ class IPAddressResource extends JsonResource
         return [
             'id' => $this->id,
             'ip' => $this->ip,
+            'label' => $this->label,
             'type' => $this->type,
             'user_id' => $this->user_id,
             'user' => new UserResource($this->whenLoaded('user')),
