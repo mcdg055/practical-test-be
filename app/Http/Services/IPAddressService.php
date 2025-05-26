@@ -30,7 +30,7 @@ class IPAddressService
 
         $ip->save();
 
-        return $ip;
+        return $ip->load('user');
     }
 
     public function fillRelations(IPAddress $ip)
