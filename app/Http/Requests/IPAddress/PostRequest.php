@@ -24,6 +24,7 @@ class PostRequest extends FormRequest
         return [
             'ip' => 'required|ip|unique:ip_addresses,ip',
             'label' => 'required|string',
+            'type' => 'required|in:IPv4,IPv6',
             'comment' => 'string|nullable',
         ];
     }

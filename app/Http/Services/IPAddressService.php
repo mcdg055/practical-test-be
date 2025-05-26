@@ -17,15 +17,29 @@ class IPAddressService
         return IPAddress::with('user')
             ->where('ip', 'like', '%' . $search . '%')
             ->orWhere('label', 'like', '%' . $search . '%')
+            ->orWhere('type', 'like', '%' . $search . '%')
             ->orWhere('comment', 'like', '%' . $search . '%')
             ->orderBy('created_at', 'asc')
             ->paginate($perPage, ['*'], 'page', $page);
+    }
+    public function read()
+    {
+        
+    }
+
+    public function edit(array $data, IPAddress $ip)
+    {
+        $ip->fill($data);
+        $ip = $this->fillRelations($ip);
+
+        $ip->save();
+
+        return $ip->load('user');
     }
 
     public function add(array $data)
     {
         $ip = new IPAddress($data);
-        $ip->type = $this->identifyIpType(Arr::get($data, 'ip'));
         $ip = $this->fillRelations($ip);
 
         $ip->save();
@@ -38,14 +52,5 @@ class IPAddressService
         $ip->user()->associate(auth()->user()->getKey());
 
         return $ip;
-    }
-
-    public function identifyIpType(string $ip)
-    {
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-            return IPAddress::TYPE_IPV4;
-        }
-
-        return IPAddress::TYPE_IPV6;;
     }
 }

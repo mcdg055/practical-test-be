@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\IPAddress;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class PatchRequest extends FormRequest
@@ -11,7 +12,11 @@ class PatchRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        if (!$this->user()->can('update', $this->route('ip'))) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -22,7 +27,22 @@ class PatchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'ip' => [
+                'required',
+                'ip',
+                'unique:ip_addresses,ip',
+                Rule::unique('ip_addresses', 'ip')->ignore($this->route('ip')->id)
+            ],
+            'label' => 'required|string',
+            'type' => 'required|in:IPv4,IPv6',
+            'comment' => 'string|nullable',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'ip.unique' => 'The IP address already exists.',
         ];
     }
 }

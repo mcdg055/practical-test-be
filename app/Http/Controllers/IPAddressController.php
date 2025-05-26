@@ -20,12 +20,20 @@ class IPAddressController extends Controller
 
     public function read(Request $request, IPAddress $ip) {}
 
-    public function edit(PatchRequest $request, IPAddress $ip) {}
+    public function edit(PatchRequest $request, IPAddress $ip)
+    {
+        return new IPAddressResource($this->service->edit($request->all(), $ip));
+    }
 
     public function add(PostRequest $request)
     {
         return new IPAddressResource($this->service->add($request->all()));
     }
 
-    public function delete(Request $request, IPAddress $ip) {}
+    public function delete(Request $request, IPAddress $ip)
+    {
+        $ip->delete();
+        
+        return new IPAddressResource($ip);
+    }
 }

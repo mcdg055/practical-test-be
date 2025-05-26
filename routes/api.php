@@ -25,6 +25,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     
     //IP Address
     Route::get(     '/ip-addresses',           [IPAddressController::class, 'browse'])->name('ip-addresses.ip-address.browse');
+    Route::patch(   '/ip-addresses/{ip}',           [IPAddressController::class, 'edit'])->name('ip-addresses.ip-address.edit');
     Route::post(    '/ip-addresses',           [IPAddressController::class, 'add'])->name('ip-addresses.ip-address.add');
+    Route::delete(  '/ip-addresses/{ip}',           [IPAddressController::class, 'delete'])->name('ip-addresses.ip-address.delete');
     
 });
