@@ -45,10 +45,8 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return $user->hasRole('Super Admin') 
-        && !$model->ipAddresses()->exists() 
-        && !Activity::causedBy($model)->exists()
-        && !Activity::forSubject($model)->exists();
+        return $user->hasRole('Super Admin')
+            && !$model->ipAddresses()->exists();
     }
     /**
      * Determine whether the user can restore the model.
