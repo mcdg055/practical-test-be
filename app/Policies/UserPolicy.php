@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
+use Spatie\Activitylog\Models\Activity;
 
 class UserPolicy
 {
@@ -44,9 +45,11 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return $user->hasRole('Super Admin');
+        return $user->hasRole('Super Admin') 
+        && !$model->ipAddresses()->exists() 
+        && !Activity::causedBy($model)->exists()
+        && !Activity::forSubject($model)->exists();
     }
-
     /**
      * Determine whether the user can restore the model.
      */

@@ -55,8 +55,22 @@ class UserController extends Controller
 
         $user->fill($data);
 
-        $user->syncRoles($request->roles);
+        $oldRoles = $user->roles->pluck('name')->toArray();
+        $newRoles = $request->roles;
+
+        $user->syncRoles($newRoles);
+
         $user->save();
+
+        $causer = $request->user();
+
+        if ($oldRoles !== $newRoles) {
+            activity()
+                ->performedOn($user)
+                ->causedBy($causer)
+                ->withProperties(['old' => $oldRoles, 'new' => $newRoles])
+                ->log("$causer->name updated user roles for $user->name");
+        }
 
         return new UserResource($user->load('roles'));
     }
