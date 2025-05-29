@@ -30,7 +30,7 @@ class UsersSeeder extends Seeder
         ];
 
         foreach ($users as $user) {
-            User::create([
+            User::firstOrCreate([
                 'name' => $user['name'],
                 'email' => $user['email'],
                 'password' => Hash::make($user['password']),
