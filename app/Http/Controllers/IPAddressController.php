@@ -18,8 +18,6 @@ class IPAddressController extends Controller
         return IPAddressResource::collection($this->service->browse($request->all()));
     }
 
-    public function read(Request $request, IPAddress $ip) {}
-
     public function edit(PatchRequest $request, IPAddress $ip)
     {
         return new IPAddressResource($this->service->edit($request->all(), $ip));
