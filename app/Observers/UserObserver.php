@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Enum\LogAction;
 use App\Models\User;
 
 class UserObserver
@@ -16,8 +17,11 @@ class UserObserver
         activity()
             ->performedOn($user)
             ->causedBy($causer)
-            ->withProperties($user->getAttributes())
-            ->log("$causer->name created user $user->name");
+            ->withProperties([
+                'attributes' => $user->getAttributes(),
+                'type' => LogAction::CREATED,
+            ])
+            ->log("Created user name $user->name");
     }
 
     /**
@@ -40,13 +44,17 @@ class UserObserver
         }
 
         activity()
-            ->causedBy(auth()->user())
+            ->causedBy($causer)
             ->performedOn($user)
             ->withProperties([
-                'old' => $oldValues,
-                'new' => $changed,
+                'attributes' => [
+                    'old' => $user->getOriginal(),
+                    'new' => $changed,
+
+                ],
+                'type' => LogAction::UPDATED,
             ])
-            ->log("$causer->name updated user $user->name details.");
+            ->log("Updated user $user->name details");
     }
 
     /**
@@ -59,8 +67,11 @@ class UserObserver
         activity()
             ->performedOn($user)
             ->causedBy($causer)
-            ->withProperties($user->getAttributes())
-            ->log("$causer->name deleted user $user->name");
+            ->withProperties([
+                'attributes' => $user->getAttributes(),
+                'type' => LogAction::DELETED,
+            ])
+            ->log("Deleted a user name $user->name");
     }
 
     /**

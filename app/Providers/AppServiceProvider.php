@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\IPAddress;
 use App\Models\User;
+use App\Observers\IPAddressObserver;
 use App\Observers\UserObserver;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -24,5 +26,6 @@ class AppServiceProvider extends ServiceProvider
     {
         JsonResource::withoutWrapping();
         User::observe(UserObserver::class);
+        IPAddress::observe(IPAddressObserver::class);
     }
 }

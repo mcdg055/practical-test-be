@@ -2,8 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\IPAddressController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\IPAddressController;
+use App\Http\Controllers\ActivityLogController;
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/register', [AuthController::class, 'register'])->name('register');
@@ -15,7 +16,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     
     //Roles
     Route::get(     '/roles',           [UserController::class, 'browseRoles'])->middleware('role:Super Admin')->name('users.role.browse');
-    
+  
     //Users
     Route::get(     '/users',           [UserController::class, 'browse'])->middleware('role:Super Admin')->name('users.user.browse');
     Route::get(     '/users/{user}',    [UserController::class, 'read'])->name('users.user.read');
@@ -29,4 +30,6 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post(    '/ip-addresses',           [IPAddressController::class, 'add'])->name('ip-addresses.ip-address.add');
     Route::delete(  '/ip-addresses/{ip}',           [IPAddressController::class, 'delete'])->name('ip-addresses.ip-address.delete');
     
+    // Activity Log
+    Route::get('/activity-logs', [ActivityLogController::class, 'browse'])->name('activity-logs.browse')->middleware(['role:Super Admin']);
 });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enum\LogAction;
 use App\Http\Requests\Users\UserPatchRequest;
 use App\Models\User;
 use Illuminate\Support\Arr;
@@ -68,7 +69,12 @@ class UserController extends Controller
             activity()
                 ->performedOn($user)
                 ->causedBy($causer)
-                ->withProperties(['old' => $oldRoles, 'new' => $newRoles])
+                ->withProperties(
+                    [
+                        'attributes' => ['old' => $oldRoles, 'new' => $newRoles],
+                        'type' => LogAction::UPDATED
+                    ]
+                )
                 ->log("$causer->name updated user roles for $user->name");
         }
 

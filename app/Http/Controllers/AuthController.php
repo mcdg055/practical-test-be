@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enum\LogAction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
@@ -27,15 +28,26 @@ class AuthController extends Controller
                 'message' => 'Unauthorized',
             ], 401);
         }
-        
+
         $refreshToken = JWTAuth::fromUser(Auth::user());
-        
+
         if (!$token) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Unauthorized',
             ], 401);
         }
+
+        activity()
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'attributes' => [
+                    'ip' => request()->ip(),
+                    'user_agent' => request()->header('User-Agent'),
+                ],
+                'type' => LogAction::LOGGED_IN
+            ])
+            ->log('Has logged in');
 
         $user = Auth::user();
         return response()->json([
@@ -75,7 +87,19 @@ class AuthController extends Controller
 
     public function logout()
     {
+        activity()
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'attributes' => [
+                    'ip' => request()->ip(),
+                    'user_agent' => request()->header('User-Agent'),
+                ],
+                'type' => LogAction::LOGGED_OUT
+            ])
+            ->log('Has logged out');
+
         Auth::logout();
+
         return response()->json([
             'status' => 'success',
             'message' => 'Successfully logged out',
