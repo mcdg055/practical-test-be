@@ -2,37 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Enum\LogAction;
-use App\Http\Requests\Users\UserPatchRequest;
 use App\Models\User;
+use App\Enum\LogAction;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
-use App\Http\Requests\Users\UserPostRequest;
+use App\Http\Services\UserService;
+use Spatie\Permission\Models\Role;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
+use App\Http\Requests\Users\UserPostRequest;
+use App\Http\Requests\Users\UserPatchRequest;
 
 class UserController extends Controller
 {
+    public function __construct(private UserService $service) {}
+
     public function browse(Request $request)
     {
         if (!$request->user()->can('viewAny', User::class)) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $data = $request->all();
-
-        $page = Arr::get($data, 'page', 1);
-        $perPage = Arr::get($data, 'perPage', 10);
-        $search = Arr::get($data, 'search', '');
-
-        $users = User::with('roles')
-            ->where('name', 'like', '%' . $search . '%')
-            ->orWhere('email', 'like', '%' . $search . '%')
-            ->orderBy('created_at', 'asc')
-            ->paginate($perPage, ['*'], 'page', $page);
-
-        return UserResource::collection($users);
+        return UserResource::collection($this->service->browse($request->all()));
     }
 
     public function read(Request $request, User $user)
@@ -46,39 +37,7 @@ class UserController extends Controller
 
     public function edit(UserPatchRequest $request, User $user)
     {
-        $data = $request->all();
-
-        if ($password = Arr::get($data, 'password')) {
-            $data['password'] = Hash::make($password);
-        } else {
-            unset($data['password']);
-        }
-
-        $user->fill($data);
-
-        $oldRoles = $user->roles->pluck('name')->toArray();
-        $newRoles = $request->roles;
-
-        $user->syncRoles($newRoles);
-
-        $user->save();
-
-        $causer = $request->user();
-
-        if ($oldRoles !== $newRoles) {
-            activity()
-                ->performedOn($user)
-                ->causedBy($causer)
-                ->withProperties(
-                    [
-                        'attributes' => ['old' => $oldRoles, 'new' => $newRoles],
-                        'type' => LogAction::UPDATED
-                    ]
-                )
-                ->log("$causer->name updated user roles for $user->name");
-        }
-
-        return new UserResource($user->load('roles'));
+        return new UserResource($this->service->edit($request->all(), $user));
     }
 
     public function add(UserPostRequest $request)

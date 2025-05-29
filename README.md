@@ -7,6 +7,10 @@ IP Address Management System that performs CRUD. The following are the supported
 2. **IP Address Management System** -> This lets the user (Admin and regular user) to add an ip address (IPv4/IPv6) with label, and an optional description.
 3. **Audit Logs** -> A module that is only visible to super admin users which records all the activities done in users and ip addresses module. The logs are undeletable. regardless of the user's role. 
 
+## Prerequisite
+- Install WSL2
+- Install Docker Desktop
+
 ## Installation
 ```
 cp .env.example .env

@@ -22,10 +22,6 @@ class IPAddressService
             ->orderBy('created_at', 'asc')
             ->paginate($perPage, ['*'], 'page', $page);
     }
-    public function read()
-    {
-        
-    }
 
     public function edit(array $data, IPAddress $ip)
     {
